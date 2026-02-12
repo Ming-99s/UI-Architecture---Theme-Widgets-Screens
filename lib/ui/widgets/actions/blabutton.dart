@@ -47,8 +47,10 @@ class Blabutton extends StatelessWidget {
         onPressed: onPressed,
       
         child: icon != null
-            ? Row(mainAxisAlignment: MainAxisAlignment.center,children: [Icon(Icons.iron,color: getTextColor,),SizedBox(width: 10,), Text(label,style: TextStyle(color:getTextColor ))])
-            : Text(label,style: TextStyle(color:getTextColor ),),
+            ? Row(mainAxisAlignment: MainAxisAlignment.center,children: [Icon(Icons.iron,color: getTextColor,),SizedBox(width: 10,), Container(padding: EdgeInsets.symmetric(vertical: 10),child: Text(label,style: TextStyle(color:getTextColor )))])
+            : Container(
+              padding: EdgeInsets.symmetric(vertical: 10),
+              child: Text(label,style: TextStyle(color:getTextColor ),)),
       ),
     );
   }

@@ -9,15 +9,17 @@ import '../model/ride/ride.dart';
 ///
 class RidesService {
   static List<Ride> allRides = fakeRides;
-
   RidesService(List<Ride> fakeRides);
 
   // TODO Create a static method to filter rides by departure location
   static List<Ride> filterByDeparture(Location departure) {
+
     return allRides
         .where((ride) => ride.departureLocation.name == departure.name)
         .toList();
   }
+
+
 
   // TODO Create a static method to filter rides by number of requested seat
   static List<Ride> filterBySeatRequested(int seatRequested) {
@@ -49,4 +51,6 @@ class RidesService {
     }
     return allRides;
   }
+
+
 }
