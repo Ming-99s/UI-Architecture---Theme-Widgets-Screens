@@ -1,7 +1,8 @@
+import 'package:blabla/ui/screens/SeatSetter.dart';
 import 'package:blabla/ui/theme/theme.dart';
-import 'package:blabla/ui/widgets/actions/DatePickerCustom.dart';
+import 'package:blabla/ui/screens/DatePickerCustom.dart';
 import 'package:blabla/ui/widgets/actions/blabutton.dart';
-import 'package:blabla/ui/widgets/actions/locationsList.dart';
+import 'package:blabla/ui/screens/locationsList.dart';
 import 'package:blabla/ui/widgets/display/ruler.dart';
 import 'package:blabla/ui/widgets/inputs/input.dart';
 import 'package:blabla/utils/animations_util.dart';
@@ -58,10 +59,26 @@ class _FormprefState extends State<Formpref> {
       context,
       RouteHelper.createBottomToTopRoute(
         CustomDatePicker(
-          initialDate:vm.date,
+          initialDate: vm.date,
           onDateSelected: (pickeDate) {
             setState(() {
               vm.setDate(pickeDate);
+            });
+          },
+        ),
+      ),
+    );
+  }
+
+  void setSeat(BuildContext context) {
+    Navigator.push(
+      context,
+      RouteHelper.createBottomToTopRoute(
+        Seatsetter(
+          value: vm.seat,
+          onTap: (setSeat) {
+            setState(() {
+              vm.setSeat(setSeat);
             });
           },
         ),
@@ -137,7 +154,7 @@ class _FormprefState extends State<Formpref> {
                         Ruler(),
                         Input(
                           label: vm.seat.toString(),
-                          onTap: () => {},
+                          onTap: () => setSeat(context),
                           icon: Icons.person,
                         ),
                       ],
@@ -163,11 +180,15 @@ class _FormprefState extends State<Formpref> {
                     opacity: _isAnimate ? 0.5 : 1.0,
                     duration: Duration(milliseconds: 200),
 
-                    child: vm.departure !=null || vm.arrive != null ?
-                    IconButton(
-                      onPressed: () => swapLocation(),
-                      icon: Icon(Icons.swap_vert, color: BlaColors.primary),
-                    ) : SizedBox.shrink(),
+                    child: vm.departure != null || vm.arrive != null
+                        ? IconButton(
+                            onPressed: () => swapLocation(),
+                            icon: Icon(
+                              Icons.swap_vert,
+                              color: BlaColors.primary,
+                            ),
+                          )
+                        : SizedBox.shrink(),
                   ),
                 ),
               ),

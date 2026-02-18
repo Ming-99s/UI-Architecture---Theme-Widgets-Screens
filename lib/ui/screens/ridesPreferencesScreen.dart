@@ -3,7 +3,7 @@ import 'package:blabla/ui/theme/theme.dart';
 import 'package:blabla/ui/widgets/actions/LocationTile.dart';
 import 'package:blabla/ui/widgets/actions/blabutton.dart';
 import 'package:blabla/ui/widgets/actions/formPref.dart';
-import 'package:blabla/ui/widgets/actions/locationsList.dart';
+import 'package:blabla/ui/screens/locationsList.dart';
 import 'package:blabla/ui/widgets/display/ruler.dart';
 import 'package:blabla/ui/widgets/inputs/input.dart';
 import 'package:blabla/viewmodel/booking_viewmodel.dart';
