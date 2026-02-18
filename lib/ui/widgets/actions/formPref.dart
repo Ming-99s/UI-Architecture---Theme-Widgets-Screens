@@ -1,9 +1,11 @@
 import 'package:blabla/ui/theme/theme.dart';
+import 'package:blabla/ui/widgets/actions/DatePickerCustom.dart';
 import 'package:blabla/ui/widgets/actions/blabutton.dart';
 import 'package:blabla/ui/widgets/actions/locationsList.dart';
 import 'package:blabla/ui/widgets/display/ruler.dart';
 import 'package:blabla/ui/widgets/inputs/input.dart';
 import 'package:blabla/utils/animations_util.dart';
+import 'package:blabla/utils/date_time_utils.dart';
 import 'package:blabla/viewmodel/booking_viewmodel.dart';
 import 'package:flutter/material.dart';
 
@@ -16,7 +18,7 @@ class Formpref extends StatefulWidget {
 
 class _FormprefState extends State<Formpref> {
   final vm = BookingViewmodel();
-  bool _isAnimate = false; 
+  bool _isAnimate = false;
 
   void pickLocation(LocationType type) async {
     final result = await Navigator.push(
@@ -37,36 +39,34 @@ class _FormprefState extends State<Formpref> {
   }
 
   void swapLocation() {
-    // start animation
     setState(() {
       _isAnimate = true;
     });
 
-    // after animation duration, swap values and reset
     Future.delayed(Duration(milliseconds: 200), () {
       setState(() {
         final temp = vm.departure;
         vm.departure = vm.arrive;
         vm.arrive = temp;
-        _isAnimate = false; // back to normal
+        _isAnimate = false;
       });
     });
   }
 
-  void pickDate(BuildContext context) async {
-    DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: vm.defualtDate,
-
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
+  void pickDate(BuildContext context) {
+    Navigator.push(
+      context,
+      RouteHelper.createBottomToTopRoute(
+        CustomDatePicker(
+          initialDate:vm.date,
+          onDateSelected: (pickeDate) {
+            setState(() {
+              vm.setDate(pickeDate);
+            });
+          },
+        ),
+      ),
     );
-
-    if (picked != null) {
-      setState(() {
-        vm.defualtDate = picked;
-      });
-    }
   }
 
   @override
@@ -129,13 +129,14 @@ class _FormprefState extends State<Formpref> {
 
                         Ruler(),
                         Input(
-                          label: vm.defualtDate.toIso8601String().split('T')[0],
+                          valueText: DateTimeUtils.formatDateTime(vm.date),
+                          label: DateTimeUtils.formatDateTime(DateTime.now()),
                           onTap: () => pickDate(context),
                           icon: Icons.calendar_month_outlined,
                         ),
                         Ruler(),
                         Input(
-                          label: vm.defualtSeat.toString(),
+                          label: vm.seat.toString(),
                           onTap: () => {},
                           icon: Icons.person,
                         ),
@@ -155,17 +156,18 @@ class _FormprefState extends State<Formpref> {
                 top: 10,
                 child: AnimatedSlide(
                   offset: _isAnimate ? Offset(0, 0.2) : Offset(0, 0),
-                  duration: Duration(milliseconds:200),
+                  duration: Duration(milliseconds: 200),
                   curve: Curves.easeInOut,
 
                   child: AnimatedOpacity(
                     opacity: _isAnimate ? 0.5 : 1.0,
-                                      duration: Duration(milliseconds: 200),
+                    duration: Duration(milliseconds: 200),
 
-                    child: IconButton(
+                    child: vm.departure !=null || vm.arrive != null ?
+                    IconButton(
                       onPressed: () => swapLocation(),
                       icon: Icon(Icons.swap_vert, color: BlaColors.primary),
-                    ),
+                    ) : SizedBox.shrink(),
                   ),
                 ),
               ),
