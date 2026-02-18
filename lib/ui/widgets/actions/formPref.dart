@@ -3,6 +3,7 @@ import 'package:blabla/ui/widgets/actions/blabutton.dart';
 import 'package:blabla/ui/widgets/actions/locationsList.dart';
 import 'package:blabla/ui/widgets/display/ruler.dart';
 import 'package:blabla/ui/widgets/inputs/input.dart';
+import 'package:blabla/utils/animations_util.dart';
 import 'package:blabla/viewmodel/booking_viewmodel.dart';
 import 'package:flutter/material.dart';
 
@@ -15,15 +16,13 @@ class Formpref extends StatefulWidget {
 
 class _FormprefState extends State<Formpref> {
   final vm = BookingViewmodel();
+  bool _isAnimate = false; 
 
   void pickLocation(LocationType type) async {
-    final result = await showModalBottomSheet(
-      isScrollControlled: true,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.zero),
-      ),
-      context: context,
-      builder: (_) => Locationslist(),
+    final result = await Navigator.push(
+      context,
+
+      RouteHelper.createBottomToTopRoute(Locationslist()),
     );
     if (result != null) {
       setState(() {
@@ -38,10 +37,19 @@ class _FormprefState extends State<Formpref> {
   }
 
   void swapLocation() {
+    // start animation
     setState(() {
-      final temp = vm.departure;
-      vm.departure = vm.arrive;
-      vm.arrive = temp;
+      _isAnimate = true;
+    });
+
+    // after animation duration, swap values and reset
+    Future.delayed(Duration(milliseconds: 200), () {
+      setState(() {
+        final temp = vm.departure;
+        vm.departure = vm.arrive;
+        vm.arrive = temp;
+        _isAnimate = false; // back to normal
+      });
     });
   }
 
@@ -87,33 +95,38 @@ class _FormprefState extends State<Formpref> {
                     padding: EdgeInsets.all(20),
                     child: Column(
                       children: [
-                        vm.locationError != null
-                            ? Column(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                                    child: Text(
-                                      '${vm.locationError}',
-                                      style: TextStyle(color: Colors.red),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                  SizedBox(height: 10),
-                                ],
-                              )
-                            : const SizedBox.shrink(),
-
-                        Input(
-                          icon: Icons.circle_outlined,
-                          label: vm.departure,
-                          onTap: () => pickLocation(LocationType.departure),
+                        AnimatedSlide(
+                          offset: _isAnimate ? Offset(0, 0.5) : Offset(0, 0),
+                          duration: Duration(milliseconds: 200),
+                          curve: Curves.easeInOut,
+                          child: AnimatedOpacity(
+                            opacity: _isAnimate ? 0.3 : 1.0,
+                            duration: Duration(milliseconds: 100),
+                            child: Input(
+                              icon: Icons.circle_outlined,
+                              label: 'Leaving from',
+                              valueText: vm.departure,
+                              onTap: () => pickLocation(LocationType.departure),
+                            ),
+                          ),
                         ),
                         Ruler(),
-                        Input(
-                          icon: Icons.circle_outlined,
-                          label: vm.arrive,
-                          onTap: () => pickLocation(LocationType.arrival),
+                        AnimatedSlide(
+                          offset: _isAnimate ? Offset(0, -0.5) : Offset(0, 0),
+                          duration: Duration(milliseconds: 200),
+                          curve: Curves.easeInOut,
+                          child: AnimatedOpacity(
+                            opacity: _isAnimate ? 0.5 : 1.0,
+                            duration: Duration(milliseconds: 100),
+                            child: Input(
+                              icon: Icons.circle_outlined,
+                              label: 'Going to',
+                              valueText: vm.arrive,
+                              onTap: () => pickLocation(LocationType.arrival),
+                            ),
+                          ),
                         ),
+
                         Ruler(),
                         Input(
                           label: vm.defualtDate.toIso8601String().split('T')[0],
@@ -140,9 +153,20 @@ class _FormprefState extends State<Formpref> {
               Positioned(
                 right: 10,
                 top: 10,
-                child: IconButton(
-                  onPressed: () => swapLocation(),
-                  icon: Icon(Icons.swap_vert, color: BlaColors.primary),
+                child: AnimatedSlide(
+                  offset: _isAnimate ? Offset(0, 0.2) : Offset(0, 0),
+                  duration: Duration(milliseconds:200),
+                  curve: Curves.easeInOut,
+
+                  child: AnimatedOpacity(
+                    opacity: _isAnimate ? 0.5 : 1.0,
+                                      duration: Duration(milliseconds: 200),
+
+                    child: IconButton(
+                      onPressed: () => swapLocation(),
+                      icon: Icon(Icons.swap_vert, color: BlaColors.primary),
+                    ),
+                  ),
                 ),
               ),
             ],

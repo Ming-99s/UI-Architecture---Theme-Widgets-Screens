@@ -36,84 +36,87 @@ class _LocationslistState extends State<Locationslist> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(color: BlaColors.white),
-      height: double.infinity,
-      padding: EdgeInsets.all(10),
-      child: Column(
-        children: [
-          SizedBox(height: 30),
-          TextField(
-            onChanged: (value) => updateSearchBar(value),
-
-            controller: _controller,
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: BlaColors.greyLight,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(30),
-                borderSide: BorderSide.none,
-              ),
-              floatingLabelBehavior: FloatingLabelBehavior.never,
-
-              labelText: 'Search',
-              prefixIcon: Padding(
-                padding: const EdgeInsets.only(left: 5),
-                child: IconButton(
-                  icon: Icon(Icons.chevron_left),
-                  onPressed: () => Navigator.pop(context),
+    return Scaffold(
+      backgroundColor: BlaColors.white,
+      body: SafeArea(
+        child: Container(
+          decoration: BoxDecoration(color: BlaColors.white),
+          padding: EdgeInsets.all(10),
+          child: Column(
+            children: [
+              TextField(
+                onChanged: (value) => updateSearchBar(value),
+        
+                controller: _controller,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: BlaColors.greyLight,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: BorderSide.none,
+                  ),
+                  floatingLabelBehavior: FloatingLabelBehavior.never,
+        
+                  labelText: 'Search',
+                  prefixIcon: Padding(
+                    padding: const EdgeInsets.only(left: 5),
+                    child: IconButton(
+                      icon: Icon(Icons.chevron_left),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ),
+                  suffixIcon: _controller.text.isNotEmpty
+                      ? Padding(
+                          padding: const EdgeInsets.only(right: 5),
+                          child: IconButton(
+                            icon: Icon(Icons.close),
+                            onPressed: clearText,
+                          ),
+                        )
+                      : null,
                 ),
               ),
-              suffixIcon: _controller.text.isNotEmpty
-                  ? Padding(
-                      padding: const EdgeInsets.only(right: 5),
-                      child: IconButton(
-                        icon: Icon(Icons.close),
-                        onPressed: clearText,
-                      ),
-                    )
-                  : null,
-            ),
+        
+              Expanded(
+                child: ListView.builder(
+                  itemCount: LocationsService.historyLocation.isNotEmpty
+                      ? LocationsService.historyLocation.length + filteredLocation.length
+                      : filteredLocation.length,
+                  itemBuilder: (context, index) {
+                    if (index < LocationsService.historyLocation.length) {
+                      final loc = LocationsService.historyLocation[index];
+                      return LocationTile(
+                        city: loc.name,
+                        country: loc.country.name,
+                        onTap: () {
+                          Navigator.pop(context, loc);
+                        },
+                        isHistoryTile: true,
+                      );
+                    } else {
+                      final loc = filteredLocation[index - LocationsService.historyLocation.length];
+                      return LocationTile(
+                        city: loc.name,
+                        country: loc.country.name,
+                        onTap: () {
+                          if (!LocationsService.historyLocation.contains(loc)) {
+                            setState(() {
+                              LocationsService.historyLocation.add(loc);
+                              setState(() {
+                                  
+                              });
+                            });
+                          }
+                          Navigator.pop(context, loc);
+                        },
+                      );
+                    }
+                  },
+                ),
+              ),
+            ],
           ),
-
-          Expanded(
-            child: ListView.builder(
-              itemCount: LocationsService.historyLocation.isNotEmpty
-                  ? LocationsService.historyLocation.length + filteredLocation.length
-                  : filteredLocation.length,
-              itemBuilder: (context, index) {
-                if (index < LocationsService.historyLocation.length) {
-                  final loc = LocationsService.historyLocation[index];
-                  return LocationTile(
-                    city: loc.name,
-                    country: loc.country.name,
-                    onTap: () {
-                      Navigator.pop(context, loc);
-                    },
-                    isHistoryTile: true,
-                  );
-                } else {
-                  final loc = filteredLocation[index - LocationsService.historyLocation.length];
-                  return LocationTile(
-                    city: loc.name,
-                    country: loc.country.name,
-                    onTap: () {
-                      if (!LocationsService.historyLocation.contains(loc)) {
-                        setState(() {
-                          LocationsService.historyLocation.add(loc);
-                          setState(() {
-                            
-                          });
-                        });
-                      }
-                      Navigator.pop(context, loc);
-                    },
-                  );
-                }
-              },
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
